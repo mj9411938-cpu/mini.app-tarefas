@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>God of War - Tarefas</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #3b1717 0%,
+                    #150909 35%,
+                    #070707 75%
+                );
+
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        .titulo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .titulo h1 {
+            margin: 0;
+
+            color: #d9b44a;
+
+            font-size: 48px;
+
+            text-shadow:
+                0 0 10px #000,
+                0 0 20px #6e1717;
+        }
+
+        .titulo p {
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .card {
+            background: rgba(20, 20, 20, 0.95);
+
+            border: 1px solid #3b3b3b;
+
+            border-radius: 12px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,.5);
+        }
+
+        .formulario {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .formulario input {
+            flex: 1;
+
+            padding: 15px;
+
+            border: 1px solid #444;
+            border-radius: 8px;
+
+            background: #111;
+            color: white;
+
+            font-size: 16px;
+
+            outline: none;
+        }
+
+        .formulario input:focus {
+            border-color: #d9b44a;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+
+            padding: 10px 15px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            transition: .2s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.15);
+        }
+
+        .btn-adicionar {
+            background: #b08b2e;
+            color: white;
+
+            padding: 0 22px;
+        }
+
+        .lista {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tarefa {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 15px;
+
+            background: #191919;
+
+            border: 1px solid #303030;
+
+            border-radius: 8px;
+
+            transition: .2s;
+        }
+
+        .tarefa:hover {
+            border-color: #555;
+        }
+
+        .tarefa.concluida {
+            opacity: .55;
+        }
+
+        .tarefa-texto {
+            flex: 1;
+
+            font-size: 17px;
+
+            word-break: break-word;
+        }
+
+        .tarefa.concluida .tarefa-texto {
+            text-decoration: line-through;
+        }
+
+        .btn-concluir {
+            background: #276749;
+            color: white;
+        }
+
+        .btn-desmarcar {
+            background: #555;
+            color: white;
+        }
+
+        .btn-excluir {
+            background: #8b2929;
+            color: white;
+        }
+
+        .vazio {
+            text-align: center;
+
+            padding: 40px 10px;
+
+            color: #777;
+        }
+
+        .contador {
+            color: #aaa;
+
+            margin-bottom: 15px;
+
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                width: 95%;
+                padding: 30px 10px;
+            }
+
+            .titulo h1 {
+                font-size: 34px;
+            }
+
+            .formulario {
+                flex-direction: column;
+            }
+
+            .btn-adicionar {
+                padding: 14px;
+            }
+
+            .tarefa {
+                flex-wrap: wrap;
+            }
+
+            .tarefa-texto {
+                width: 100%;
+                flex-basis: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="titulo">
+
+        <h1>GOD OF WAR</h1>
+
+        <p>Gerenciador de tarefas</p>
+
+    </div>
+
+
+    <div class="card">
+
+        <!-- ADICIONAR TAREFA -->
+
+        <form
+            class="formulario"
+            action="/adicionar"
+            method="POST"
+        >
+
+            <input
+                type="text"
+                name="titulo"
+                placeholder="Digite uma nova tarefa..."
+                autocomplete="off"
+                required
+                autofocus
+            >
+
+            <button
+                class="btn-adicionar"
+                type="submit"
+            >
+                + Adicionar
+            </button>
+
+        </form>
+
+
+        <div class="contador">
+
+            {{ tarefas|length }} tarefa(s)
+
+        </div>
+
+
+        <!-- LISTA DE TAREFAS -->
+
+        <div class="lista">
+
+            {% if tarefas %}
+
+                {% for tarefa in tarefas %}
+
+                    <div
+                        class="tarefa
+                        {% if tarefa['concluida'] %}
+                            concluida
+                        {% endif %}"
+                    >
+
+                        <div class="tarefa-texto">
+
+                            {{ tarefa['titulo'] }}
+
+                        </div>
+
+
+                        <!-- CONCLUIR -->
+
+                        <form
+                            action="/concluir/{{ tarefa['id'] }}"
+                            method="POST"
+                        >
+
+                            <button
+                                type="submit"
+
+                                class="
+                                {% if tarefa['concluida'] %}
+                                    btn-desmarcar
+                                {% else %}
+                                    btn-concluir
+                                {% endif %}
+                                "
+                            >
+
+                                {% if tarefa['concluida'] %}
+
+                                    Desmarcar
+
+                                {% else %}
+
+                                    Concluir
+
+                                {% endif %}
+
+                            </button>
+
+                        </form>
+
+
+                        <!-- EXCLUIR -->
+
+                        <form
+                            action="/excluir/{{ tarefa['id'] }}"
+                            method="POST"
+                            onsubmit="
+                                return confirm(
+                                    'Deseja realmente excluir esta tarefa?'
+                                );
+                            "
+                        >
+
+                            <button
+                                class="btn-excluir"
+                                type="submit"
+                            >
+
+                                Excluir
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="vazio">
+
+                    Nenhuma tarefa cadastrada.
+
+                    <br>
+
+                    Adicione uma tarefa acima.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // Limpa o campo depois de adicionar uma tarefa
+    // e permite usar Enter normalmente.
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const input = document.querySelector(
+            'input[name="titulo"]'
+        );
+
+        if (input) {
+            input.focus();
+        }
+
+    });
+
+</script>
+
+</body>
+
+</html>
